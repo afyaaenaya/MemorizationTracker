@@ -1,5 +1,5 @@
 import random
-from book import get_verse_count, get_verse_text, get_next_5_verses_text
+from book import get_verse_count, get_verse_text, get_next_5_verses_text, get_chapters
 from tracker import get_low_scores, update_score
 
 
@@ -51,6 +51,7 @@ def mode_selector():
 def chapter_selector():
     while True:
         try:
+            print(*get_chapters())
             start_chapter = int(input("Start chapter: "))
             end_chapter = int(input("End chapter: "))
         except ValueError:

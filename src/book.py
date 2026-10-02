@@ -21,6 +21,9 @@ with open(DATA_DIR / "quran-min-tashkeel.json", "r", encoding="utf-8") as file:
         book = json.load(file)
 
 
+def get_chapters():
+    return [f"{chapter['id']}: {get_display(reshaper.reshape(chapter['name']))}" for chapter in book] 
+
 
 def get_chapter_by_id(chapter_id):
     for chapter in book:
