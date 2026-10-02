@@ -1,8 +1,16 @@
 import json
+import os
 from datetime import datetime
+from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 SCORE_HALF_LIFE_DAYS = 30
+
+
+class ProgressFileError(ValueError):
+    """Progress cannot be loaded safely."""
 
 
 def calculate_score(card):
@@ -63,10 +71,30 @@ def get_low_scores():
     return sorted(load_progress(), key=calculate_score)
 
 def load_progress():
-    with open('data/score.json', 'r') as file:
-            scores = json.load(file)
-    return scores
+    progress_path = DATA_DIR / "score.json"
+    try:
+        with open(progress_path, "r", encoding="utf-8") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        raise ProgressFileError(
+            f"Cannot read progress from {progress_path}: invalid JSON or encoding. "
+            "The file has been left unchanged. Repair it before trying again."
+        ) from error
 
 def save_progress(scores):
-    with open("data/score.json", "w", encoding="utf-8") as file:
-        json.dump(scores, file, indent=4)
+    temporary_path = None
+    try:
+        with NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=DATA_DIR,
+            prefix="score-", suffix=".tmp", delete=False
+        ) as file:
+            temporary_path = Path(file.name)
+            json.dump(scores, file, indent=4)
+            file.flush()
+            os.fsync(file.fileno())
+        os.replace(temporary_path, DATA_DIR / "score.json")
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)

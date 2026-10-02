@@ -101,6 +101,7 @@ def quiz_card(chapter_id, verse_id):
     next_verses = get_next_5_verses_text(chapter_id, verse_id)
     if not next_verses:
         print('End of text.')
+        return
     
     input("Press Enter to reveal next verses.")
 

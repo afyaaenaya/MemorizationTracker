@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 from arabic_reshaper import ArabicReshaper # Used to make Arabic text display properly
 from bidi.algorithm import get_display # Used to make Arabic text display properly
 
@@ -12,9 +13,11 @@ configuration = {
 
 reshaper = ArabicReshaper(configuration=configuration)
 
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
 # Text source:
 # https://github.com/amrayn/quran-text/blob/main/quran-min-tashkeel.json
-with open("data/quran-min-tashkeel.json", "r", encoding="utf-8") as file:
+with open(DATA_DIR / "quran-min-tashkeel.json", "r", encoding="utf-8") as file:
         book = json.load(file)
 
 
@@ -53,12 +56,12 @@ def get_verse(chapter_id, verse_id):
 
 
 def get_next_5_verses(chapter_id, verse_id):
-    results = []
+    text = []
 
     current_chapter_id = chapter_id
     current_verse_id = verse_id + 1
 
-    while len(results) < 5:
+    while len(text) < 5:
         chapter = get_chapter_by_id(current_chapter_id)
 
         if chapter is None:
@@ -68,18 +71,15 @@ def get_next_5_verses(chapter_id, verse_id):
         
         for verse in verses:
             if verse['id'] >= current_verse_id:
-                results.append(verse)
+                text.append(verse)
                 
-                if len(results) == 5:
-                    return results
+                if len(text) == 5:
+                    return text
                 
         current_chapter_id += 1
         current_verse_id = 1
     
-    if not results:
-        return None
-    else:
-        return results
+    return text
 
 
 
@@ -107,7 +107,4 @@ def get_next_5_verses_text(chapter_id, verse_id):
         results.append(get_display(reshaped_verse))
     
     
-    if not results:
-            return None
-    else:
-        return results
+    return results
