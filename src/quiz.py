@@ -109,9 +109,14 @@ def quiz_card(chapter_id, verse_id):
     for verse in next_verses:
         print(verse)
         
-    answer = input("Did you recite them correctly? (y/n): ").strip().lower()
-    while answer not in ("y", "n"):
-        answer = input("Please enter y or n: ").strip().lower()
+    answer = input("Did you recite them correctly? (y/n/0 to cancel): ").strip().lower()
+    
+    while answer not in ("y", "n", "0"):
+        answer = input("Please enter (y/n/0 to cancel): ").strip().lower()
+    
+    if answer == '0':
+            print("Question cancelled.")
+            return
     
     update_score(chapter_id, verse_id, correct=(answer == "y"))
     print("Progress saved.")
