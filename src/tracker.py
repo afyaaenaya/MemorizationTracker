@@ -2,10 +2,22 @@ import json
 from datetime import datetime
 
 
+SCORE_HALF_LIFE_DAYS = 30
+
+
 def calculate_score(card):
-    if card["attempts"] == 0:
+    attempts = card.get("attempts", 0)
+    if attempts == 0 or not card.get("last_reviewed"):
         return 0.0
-    return 100 * card["correct_count"] / card["attempts"]
+
+    last_reviewed = datetime.fromisoformat(card["last_reviewed"])
+    now = datetime.now(last_reviewed.tzinfo)
+    days_since_review = max(0.0, (now - last_reviewed).total_seconds() / 86400)
+    time_factor = 0.5 ** (days_since_review / SCORE_HALF_LIFE_DAYS)
+    accuracy = 100 * card.get("correct_count", 0) / attempts
+    return accuracy * time_factor
+
+
 
 def get_score(chapter_id, verse_id):
     for card in load_progress():
@@ -13,6 +25,8 @@ def get_score(chapter_id, verse_id):
             return calculate_score(card)
         
     return None
+    
+    
     
 def update_score(chapter_id, verse_id, correct: bool):
     cards = load_progress()
@@ -41,12 +55,12 @@ def update_score(chapter_id, verse_id, correct: bool):
     tested_card['last_reviewed'] = datetime.now().isoformat()
         
     save_progress(cards)
-    
+
 
 
 
 def get_low_scores():
-    return sorted(load_progress(), key=lambda card: card["score"])
+    return sorted(load_progress(), key=calculate_score)
 
 def load_progress():
     with open('data/score.json', 'r') as file:
