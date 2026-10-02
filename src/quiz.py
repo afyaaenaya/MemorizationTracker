@@ -66,34 +66,36 @@ def chapter_selector():
 
 
 def quiz_random_verse(start_chapter, end_chapter):
-    chapter_id = random.randint(start_chapter, end_chapter)
+    while True:
+        chapter_id = random.randint(start_chapter, end_chapter)
 
-    verse_count = get_verse_count(chapter_id)
-    verse_id = random.randint(1, verse_count)
+        verse_count = get_verse_count(chapter_id)
+        verse_id = random.randint(1, verse_count)
 
-    quiz_card(chapter_id, verse_id)
+        quiz_card(chapter_id, verse_id)
 
 
     
 def quiz_weakest_verse(start_chapter = None, end_chapter = None):
-    cards = get_low_scores()
-    
-    if start_chapter is None and end_chapter is None:
-            eligible_cards = cards
-            
-    else:
-        eligible_cards = [card for card in cards if start_chapter <= card['chapter_id'] <= end_chapter]
-    
-    if eligible_cards:
-        weakest = eligible_cards[0]
-    else:
-        print('No verses found')
-        return
+    while True:
+        cards = get_low_scores()
+        
+        if start_chapter is None and end_chapter is None:
+                eligible_cards = cards
+                
+        else:
+            eligible_cards = [card for card in cards if start_chapter <= card['chapter_id'] <= end_chapter]
+        
+        if eligible_cards:
+            weakest = eligible_cards[0]
+        else:
+            print('No verses found')
+            return
 
-    chapter_id = weakest["chapter_id"]
-    verse_id = weakest["verse_id"]
+        chapter_id = weakest["chapter_id"]
+        verse_id = weakest["verse_id"]
 
-    quiz_card(chapter_id, verse_id)
+        quiz_card(chapter_id, verse_id)
 
 
 def quiz_card(chapter_id, verse_id):
