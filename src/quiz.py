@@ -1,6 +1,6 @@
 import random
 from book import get_verse_count, get_verse_text, get_next_5_verses_text
-from tracker import get_weak_verses, update_score
+from tracker import get_low_scores, update_score
 
 
 
@@ -75,7 +75,7 @@ def quiz_random_verse(start_chapter, end_chapter):
 
     
 def quiz_weakest_verse(start_chapter = None, end_chapter = None):
-    cards = get_weak_verses()
+    cards = get_low_scores()
     
     if start_chapter is None and end_chapter is None:
             eligible_cards = cards

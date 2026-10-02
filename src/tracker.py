@@ -1,37 +1,51 @@
 import json
+from datetime import datetime
+
+
+def calculate_score(card):
+    if card["attempts"] == 0:
+        return 0.0
+    return 100 * card["correct_count"] / card["attempts"]
 
 def get_score(chapter_id, verse_id):
     for card in load_progress():
         if card["chapter_id"] == chapter_id and card["verse_id"] == verse_id:
-            return card["score"]
-    return 0
+            return calculate_score(card)
+        
+    return None
     
 def update_score(chapter_id, verse_id, correct: bool):
-    scores = load_progress()
+    cards = load_progress()
+    
+    tested_card = None
 
-    for score in scores:
-        if (score["chapter_id"] == chapter_id and score["verse_id"] == verse_id):
-            if correct:
-                score["score"] += 1
-            else:
-                score["score"] -= 1
-
-            save_progress(scores)
-            return
+    for card in cards:
+        if (card["chapter_id"] == chapter_id and card["verse_id"] == verse_id):
+            tested_card = card
+            
+    if tested_card is None:
+        tested_card = {
+            'chapter_id': chapter_id,
+            'verse_id': verse_id,
+            'correct_count': 0,
+            'attempts': 0,
+            'last_reviewed': datetime.min.isoformat()
+        }
+        cards.append(tested_card)
         
-    new_score = {
-        "chapter_id": chapter_id,
-        "verse_id": verse_id,
-        "score": 1 if correct else -1
-    }
+    tested_card.setdefault('attempts', 0)
+    tested_card.setdefault('correct_count', 0)
 
-    scores.append(new_score)
-    save_progress(scores)
+    tested_card['attempts'] += 1
+    tested_card['correct_count'] += int(correct)
+    tested_card['last_reviewed'] = datetime.now().isoformat()
+        
+    save_progress(cards)
     
 
 
 
-def get_weak_verses():
+def get_low_scores():
     return sorted(load_progress(), key=lambda card: card["score"])
 
 def load_progress():
