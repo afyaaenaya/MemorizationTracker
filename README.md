@@ -82,6 +82,8 @@ Data paths are resolved relative to the source files, so they do not depend on t
 ## Next steps
 
 - Validate saved cards, including chapter and verse IDs, counters, timestamps, and duplicate entries.
+- Move cards from JSON file to SQL database.
+- Fix issue with multiline Arabic text where line order is inverted.
 - Add a proper session exit option that is not **Ctrl + C**.
 - Handle file-access and save failures with clear messages.
 - Exclude questions that go out of the selected chapter range.
